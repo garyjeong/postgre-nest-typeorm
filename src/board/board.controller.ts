@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { BoardService } from './board.service';
 import {
   CreateBoardRequestDto,
@@ -10,9 +19,15 @@ import { BoardResponseDto } from './dto/response.dto';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  @Get()
-  async getBoard(@Body('id') id: string): Promise<BoardResponseDto> {
-    return await this.boardService.findOne(id);
+  @Get(':id')
+  async getBoard(@Param('id') id: string): Promise<BoardResponseDto> {
+    const result = await this.boardService.findOne(id);
+
+    if (!result) {
+      throw new NotFoundException();
+    }
+
+    return result;
   }
 
   @Get()
@@ -39,6 +54,7 @@ export class BoardController {
       H: formatData(date.getHours()),
       I: formatData(date.getMinutes()),
       S: formatData(date.getSeconds()),
+      MS: formatData(date.getMilliseconds()),
     };
 
     createBoardDto.board_id =
@@ -48,22 +64,29 @@ export class BoardController {
       dateFormat.D +
       dateFormat.H +
       dateFormat.I +
-      dateFormat.S;
-    console.log(dateFormat);
+      dateFormat.S +
+      dateFormat.MS;
+
     this.boardService.createBoard(createBoardDto);
     return 'success';
   }
 
-  @Put()
+  @Put(':id')
   async updateBoard(
+    @Param('id') id: string,
     @Body() updateBoardDto: UpdateBoardRequestDto,
   ): Promise<string> {
-    this.boardService.updateBoard(updateBoardDto.board_id, updateBoardDto);
+    const exist = await this.boardService.countToId(id);
+    // console.log(exist);
+    if (!exist) {
+      throw new NotFoundException();
+    }
+    this.boardService.updateBoard(id, updateBoardDto);
     return 'success';
   }
 
-  @Delete()
-  async deleteBoard(@Body('id') id: string): Promise<string> {
+  @Delete(':id')
+  async deleteBoard(@Param('id') id: string): Promise<string> {
     this.boardService.deleteBoard(id);
     return 'success';
   }

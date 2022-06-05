@@ -14,8 +14,16 @@ export class BoardService {
     private boardRepository: BoardRepository,
   ) {}
 
+  countToId(id: string): Promise<number> {
+    return this.boardRepository.count({
+      board_id: id,
+    });
+  }
+
   findOne(id: string): Promise<Board> {
-    return this.boardRepository.findOne({ board_id: id });
+    return this.boardRepository.findOneOrFail({
+      board_id: id,
+    });
   }
 
   findAll(): Promise<Board[]> {
@@ -27,7 +35,7 @@ export class BoardService {
   }
 
   updateBoard(id: string, updateBoardDto: UpdateBoardRequestDto): void {
-    this.boardRepository.update(+id, updateBoardDto);
+    this.boardRepository.update(id, updateBoardDto);
   }
 
   deleteBoard(id: string): void {

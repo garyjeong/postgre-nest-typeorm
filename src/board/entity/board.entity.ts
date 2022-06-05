@@ -9,10 +9,7 @@ import {
 
 @Entity()
 export class Board {
-  @PrimaryGeneratedColumn()
-  seq: number;
-
-  @Column({ type: 'varchar', length: 30, nullable: false })
+  @Column({ primary: true, type: 'varchar', length: 30, nullable: false })
   board_id: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })

@@ -15,7 +15,7 @@ export class DatabaseConfigService implements TypeOrmOptionsFactory {
       username: this.config.get<string>('DBUSER'),
       password: this.config.get<string>('DBPWD'),
       entities: [this.config.get<string>('ENTITY_PATH')],
-      synchronize: true,
+      synchronize: false,
       keepConnectionAlive: true,
       logging: true,
     };
